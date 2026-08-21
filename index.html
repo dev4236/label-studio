@@ -1,958 +1,2126 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/>
-<title>Label Studio Pro</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0f1117;--bg2:#181c27;--bg3:#1e2436;--bg4:#252c3e;
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
-  --text:#e8ecf3;--text2:#9aa0b4;--text3:#6b718a;
-  --accent:#4f6ef7;--accent-h:#3f5de0;--green:#22c55e;
-  --tb:#60a5fa;--tg:#34d399;--tp:#a78bfa;--ty:#fbbf24;
-}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;font-size:13px;line-height:1.4}
-/* Nav */
-.nav{display:flex;align-items:center;gap:8px;padding:0 16px;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
-.nav-logo{display:flex;align-items:center;gap:10px;margin-right:4px}
-.nav-icon{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.nav-title{font-size:15px;font-weight:600}
-.nav-sub{font-size:11px;color:var(--text2);margin-top:1px}
-.nav-sp{flex:1}
-.nb{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap}
-.nb:hover{background:var(--bg3)}
-.nb svg{width:14px;height:14px;flex-shrink:0}
-.nb-ic{padding:6px 8px}
-.nb-acc{background:var(--accent);border-color:var(--accent);font-weight:500}
-.nb-acc:hover{background:var(--accent-h)}
-/* Main */
-.main{flex:1;padding:20px;display:flex;flex-direction:column;gap:14px}
-/* Control row */
-.ctrl{display:flex;flex-wrap:wrap;gap:12px;align-items:start;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
-.ctrl>.cg:nth-child(1){flex:0 0 200px;min-width:160px}
-.ctrl>.cg:nth-child(2){flex:1 1 220px;min-width:180px}
-.ctrl>.cg:nth-child(3){flex:0 0 150px;min-width:130px}
-.ctrl>.cg:nth-child(4){flex:0 0 175px;min-width:150px}
-.ctrl>.cg:nth-child(5){flex:0 0 auto;margin-left:auto}
-.cg{display:flex;flex-direction:column;gap:6px}
-.cl{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
-.cl svg,.cl button svg{width:13px;height:13px;flex-shrink:0}
-.cn{font-size:11px;color:var(--text3)}
-/* Barcode type dropdown */
-.type-wrap{position:relative}
-.type-sel{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;user-select:none}
-.type-sel:hover{background:var(--bg4)}
-.type-sel svg{width:15px;height:15px;color:var(--text2);flex-shrink:0}
-.type-val{flex:1;font-size:13px}
-.type-drop{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px;z-index:300;box-shadow:0 6px 24px rgba(0,0,0,.5)}
-.type-drop.open{display:block}
-.type-opt{padding:7px 10px;border-radius:5px;cursor:pointer;font-size:13px}
-.type-opt:hover{background:var(--bg4)}
-.type-opt.active{color:var(--accent)}
-/* Template */
-.tpl-wrap{position:relative}
-.tpl-input{width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:'SF Mono','Fira Code',monospace;outline:none}
-.tpl-input:focus{border-color:var(--accent)}
-.ib{background:none;border:none;padding:0;cursor:pointer;color:var(--text3);display:inline-flex;align-items:center}
-.ib:hover{color:var(--text2)}
-/* Popover */
-.pop{display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:300;width:340px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
-.pop.open{display:block}
-.pop-title{font-size:13px;font-weight:600;margin-bottom:3px}
-.pop-sub{font-size:12px;color:var(--text2);margin-bottom:12px}
-.ps{margin-bottom:10px}
-.ps-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px}
-.pr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:3px}
-.pt{display:inline-flex;padding:2px 8px;border-radius:5px;font-family:'SF Mono','Fira Code',monospace;font-size:11px;font-weight:500;white-space:nowrap}
-.pt.b{background:rgba(96,165,250,.15);color:var(--tb)}
-.pt.g{background:rgba(52,211,153,.15);color:var(--tg)}
-.pt.p{background:rgba(167,139,250,.15);color:var(--tp)}
-.pt.y{background:rgba(251,191,36,.15);color:var(--ty)}
-.pe{font-size:11px;color:var(--text3)}
-.pfooter{font-size:11px;color:var(--text3);margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
-/* Stepper */
-.stp{display:flex;align-items:center;gap:5px}
-.stv{flex:1;padding:8px 6px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;text-align:center;font-family:'SF Mono','Fira Code',monospace;min-width:0}
-.stu{font-size:11px;color:var(--text3)}
-.stb{width:30px;height:30px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.stb:hover{background:var(--bg4)}
-.stb svg{width:14px;height:14px}
-/* Action buttons */
-.btn-gen{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;border-radius:8px;background:var(--accent);border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;margin-top:16px}
-.btn-gen:hover{background:var(--accent-h)}
-.btn-gen svg{width:14px;height:14px}
-.btn-clr{display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;margin-top:5px}
-.btn-clr:hover{background:var(--bg3)}
-.btn-clr svg{width:13px;height:13px}
-/* Auto-update toggle */
-.auto-row{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:11px;color:var(--text2)}
-.toggle{position:relative;width:30px;height:16px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0;position:absolute}
-.toggle-track{position:absolute;inset:0;background:var(--bg4);border-radius:8px;border:1px solid var(--border2);cursor:pointer;transition:background .2s}
-.toggle input:checked~.toggle-track{background:var(--accent)}
-.toggle-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;background:#fff;border-radius:50%;pointer-events:none;transition:left .2s}
-.toggle input:checked~.toggle-thumb{left:16px}
-/* Status row */
-.sr{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 16px}
-.sr-chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sr-chk svg{width:13px;height:13px;color:var(--green)}
-.sr-text{font-size:13px;font-weight:600;color:var(--green)}
-.sr-range{font-size:12px;color:var(--text2);margin-top:1px}
-.sr-sp{flex:1}
-/* Export */
-.exp-wrap{position:relative}
-.btn-exp{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;cursor:pointer;font-family:inherit}
-.btn-exp:hover{background:var(--bg4)}
-.btn-exp svg{width:14px;height:14px}
-.exp-drop{display:none;position:absolute;top:calc(100% + 4px);right:0;z-index:300;width:155px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px;box-shadow:0 6px 24px rgba(0,0,0,.4)}
-.exp-drop.open{display:block}
-.di{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:5px;cursor:pointer;font-size:12px;color:var(--text);background:none;border:none;width:100%;font-family:inherit}
-.di:hover{background:var(--bg4)}
-.di svg{width:13px;height:13px;color:var(--text2);flex-shrink:0}
-.btn-dup{display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;cursor:pointer;font-family:inherit}
-.dup-b{background:var(--accent);color:#fff;border-radius:10px;font-size:11px;font-weight:600;padding:1px 6px}
-/* Grid */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-min,170px),1fr));gap:12px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.card:hover{border-color:var(--border2)}
-.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 11px 3px}
-.card-num{font-size:12px;font-weight:600;color:var(--text2)}
-.card-copy{width:25px;height:25px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center}
-.card-copy:hover{background:var(--bg4);color:var(--text)}
-.card-copy svg{width:13px;height:13px}
-.card-bc{padding:8px 10px;overflow:auto;background:#fff;display:flex;align-items:center;justify-content:center}
-.card-bc svg,.card-bc canvas,.card-bc img{display:block;max-width:100%}
-.card-lbl{text-align:center;padding:6px 10px 10px;font-size:12px;font-family:'SF Mono','Fira Code',monospace;border-top:1px solid var(--border)}
-/* Status bar */
-.sbar{display:flex;align-items:center;justify-content:space-between;padding:7px 20px;background:var(--bg2);border-top:1px solid var(--border);font-size:11px;color:var(--text3);flex-shrink:0}
-.sbar-ok{display:flex;align-items:center;gap:5px;color:var(--green)}
-.sbar-ok svg{width:12px;height:12px}
-/* Toast */
-.toast{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border2);color:var(--text);font-size:12px;padding:6px 14px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:999;white-space:nowrap}
-.toast.show{opacity:1}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#181c27" />
+  <meta name="description" content="Generate barcodes &amp; GS1 Data Matrix codes with ease" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Label Studio" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <title>Label Studio</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent
+    }
+
+    :root {
+      --bg: #0f1117;
+      --bg2: #181c27;
+      --bg3: #1e2436;
+      --bg4: #252c3e;
+      --border: rgba(255, 255, 255, 0.08);
+      --border2: rgba(255, 255, 255, 0.14);
+      --text: #e8ecf3;
+      --text2: #9aa0b4;
+      --text3: #6b718a;
+      --accent: #4f6ef7;
+      --accent-h: #3f5de0;
+      --green: #22c55e;
+      --tb: #60a5fa;
+      --tg: #34d399;
+      --tp: #a78bfa;
+      --ty: #fbbf24;
+    }
+
+    html,
+    body {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    /* Nav */
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px;
+      min-height: 56px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-right: 4px
+    }
+
+    .nav-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .nav-title {
+      font-size: 15px;
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    .nav-sub {
+      font-size: 11px;
+      color: var(--text2);
+      margin-top: 1px
+    }
+
+    .nav-sp {
+      flex: 1
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .nb {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 7px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+      white-space: nowrap;
+      min-height: 36px;
+      user-select: none;
+    }
+
+    .nb:hover {
+      background: var(--bg3)
+    }
+
+    .nb svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0
+    }
+
+    .nb-ic {
+      padding: 7px 10px
+    }
+
+    .nb-acc {
+      background: var(--accent);
+      border-color: var(--accent);
+      font-weight: 500;
+      color: #fff
+    }
+
+    .nb-acc:hover {
+      background: var(--accent-h)
+    }
+
+    .nb-install {
+      background: var(--bg3);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 500
+    }
+
+    .nb-install:hover {
+      background: var(--bg4)
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto
+    }
+
+    /* Control row */
+    .ctrl {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      align-items: start;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    @media (min-width: 1024px) {
+      .ctrl {
+        grid-template-columns: 1.2fr 2fr 1.1fr 1.1fr auto;
+      }
+    }
+
+    .cg {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0
+    }
+
+    .cl {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: .05em
+    }
+
+    .cl svg,
+    .cl button svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0
+    }
+
+    .cn {
+      font-size: 11px;
+      color: var(--text3)
+    }
+
+    /* Barcode type dropdown */
+    .type-wrap {
+      position: relative
+    }
+
+    .type-sel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      cursor: pointer;
+      user-select: none;
+      min-height: 38px
+    }
+
+    .type-sel:hover {
+      background: var(--bg4)
+    }
+
+    .type-sel svg {
+      width: 15px;
+      height: 15px;
+      color: var(--text2);
+      flex-shrink: 0
+    }
+
+    .type-val {
+      flex: 1;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .type-drop {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 4px;
+      z-index: 350;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, .5)
+    }
+
+    .type-drop.open {
+      display: block
+    }
+
+    .type-opt {
+      padding: 8px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px
+    }
+
+    .type-opt:hover {
+      background: var(--bg4)
+    }
+
+    .type-opt.active {
+      color: var(--accent);
+      font-weight: 500
+    }
+
+    /* Template */
+    .tpl-wrap {
+      position: relative
+    }
+
+    .tpl-input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 7px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      outline: none;
+      min-height: 38px
+    }
+
+    .tpl-input:focus {
+      border-color: var(--accent)
+    }
+
+    .ib {
+      background: none;
+      border: none;
+      padding: 2px;
+      cursor: pointer;
+      color: var(--text3);
+      display: inline-flex;
+      align-items: center
+    }
+
+    .ib:hover {
+      color: var(--text2)
+    }
+
+    /* Popover */
+    .pop {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 350;
+      width: 340px;
+      max-width: calc(100vw - 32px);
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .5)
+    }
+
+    .pop.open {
+      display: block
+    }
+
+    .pop-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 3px
+    }
+
+    .pop-sub {
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 12px
+    }
+
+    .ps {
+      margin-bottom: 10px
+    }
+
+    .ps-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 4px
+    }
+
+    .pr {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 3px
+    }
+
+    .pt {
+      display: inline-flex;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap
+    }
+
+    .pt.b {
+      background: rgba(96, 165, 250, .15);
+      color: var(--tb)
+    }
+
+    .pt.g {
+      background: rgba(52, 211, 153, .15);
+      color: var(--tg)
+    }
+
+    .pt.p {
+      background: rgba(167, 139, 250, .15);
+      color: var(--tp)
+    }
+
+    .pt.y {
+      background: rgba(251, 191, 36, .15);
+      color: var(--ty)
+    }
+
+    .pe {
+      font-size: 11px;
+      color: var(--text3)
+    }
+
+    .pfooter {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 10px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px
+    }
+
+    /* Stepper */
+    .stp {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 38px
+    }
+
+    .stv {
+      flex: 1;
+      padding: 8px 6px;
+      border-radius: 7px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 13px;
+      text-align: center;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      min-width: 0
+    }
+
+    .stu {
+      font-size: 11px;
+      color: var(--text3)
+    }
+
+    .stb {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .stb:hover {
+      background: var(--bg4)
+    }
+
+    .stb svg {
+      width: 14px;
+      height: 14px
+    }
+
+    /* Action buttons */
+    .btn-gen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      min-height: 38px
+    }
+
+    .btn-gen:hover {
+      background: var(--accent-h)
+    }
+
+    .btn-gen svg {
+      width: 14px;
+      height: 14px
+    }
+
+    .btn-clr {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 7px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--text2);
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      min-height: 34px
+    }
+
+    .btn-clr:hover {
+      background: var(--bg3)
+    }
+
+    .btn-clr svg {
+      width: 13px;
+      height: 13px
+    }
+
+    /* Auto-update toggle */
+    .auto-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--text2);
+      cursor: pointer;
+      user-select: none
+    }
+
+    .toggle {
+      position: relative;
+      width: 30px;
+      height: 16px;
+      flex-shrink: 0
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--bg4);
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      cursor: pointer;
+      transition: background .2s
+    }
+
+    .toggle input:checked~.toggle-track {
+      background: var(--accent)
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border-radius: 50%;
+      pointer-events: none;
+      transition: left .2s
+    }
+
+    .toggle input:checked~.toggle-thumb {
+      left: 16px
+    }
+
+    /* Status row */
+    .sr {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 16px;
+      flex-wrap: wrap
+    }
+
+    .sr-chk {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .sr-chk svg {
+      width: 13px;
+      height: 13px;
+      color: var(--green)
+    }
+
+    .sr-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--green)
+    }
+
+    .sr-range {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 1px
+    }
+
+    .sr-sp {
+      flex: 1
+    }
+
+    /* Export */
+    .exp-wrap {
+      position: relative
+    }
+
+    .btn-exp {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      min-height: 36px
+    }
+
+    .btn-exp:hover {
+      background: var(--bg4)
+    }
+
+    .btn-exp svg {
+      width: 14px;
+      height: 14px
+    }
+
+    .exp-drop {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      z-index: 350;
+      width: 160px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 4px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, .4)
+    }
+
+    .exp-drop.open {
+      display: block
+    }
+
+    .di {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text);
+      background: none;
+      border: none;
+      width: 100%;
+      font-family: inherit
+    }
+
+    .di:hover {
+      background: var(--bg4)
+    }
+
+    .di svg {
+      width: 13px;
+      height: 13px;
+      color: var(--text2);
+      flex-shrink: 0
+    }
+
+    .btn-dup {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      min-height: 36px
+    }
+
+    .btn-dup svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0
+    }
+
+    .dup-b {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 6px
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-min, 170px)), 1fr));
+      gap: 12px
+    }
+
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden
+    }
+
+    .card:hover {
+      border-color: var(--border2)
+    }
+
+    .card-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 11px 3px
+    }
+
+    .card-num {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2)
+    }
+
+    .card-copy {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .card-copy:hover {
+      background: var(--bg4);
+      color: var(--text)
+    }
+
+    .card-copy svg {
+      width: 13px;
+      height: 13px
+    }
+
+    .card-bc {
+      padding: 8px 10px;
+      overflow-x: auto;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100%
+    }
+
+    .card-bc svg,
+    .card-bc canvas,
+    .card-bc img {
+      display: block;
+      max-width: 100%;
+      height: auto
+    }
+
+    .card-lbl {
+      text-align: center;
+      padding: 6px 10px 10px;
+      font-size: 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      border-top: 1px solid var(--border);
+      word-break: break-all
+    }
+
+    /* Status bar */
+    .sbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text3);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .sbar-ok {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--green)
+    }
+
+    .sbar-ok svg {
+      width: 12px;
+      height: 12px
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg4);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-size: 12px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+      z-index: 999;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .4)
+    }
+
+    .toast.show {
+      opacity: 1
+    }
+
+    /* Modal Overlay & Responsive Sheet */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .6);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 16px
+    }
+
+    .modal-overlay.open {
+      display: flex
+    }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .6)
+    }
+
+    .modal-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0
+    }
+
+    .modal-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 14px;
+      font-weight: 600
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 22px;
+      cursor: pointer;
+      padding: 0 6px;
+      line-height: 1
+    }
+
+    .modal-close:hover {
+      color: var(--text)
+    }
+
+    .mbtn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 11px;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      min-height: 32px
+    }
+
+    .mbtn:hover {
+      background: var(--bg4)
+    }
+
+    .mbtn svg {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0
+    }
+
+    .mbtn-acc {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff
+    }
+
+    .mbtn-acc:hover {
+      background: var(--accent-h)
+    }
+
+    .preset-save-row {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      flex-wrap: wrap
+    }
+
+    .preset-name-input {
+      flex: 1;
+      min-width: 160px;
+      padding: 7px 10px;
+      border-radius: 7px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      min-height: 36px
+    }
+
+    .preset-name-input:focus {
+      border-color: var(--accent)
+    }
+
+    .preset-list {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px
+    }
+
+    .preset-empty {
+      padding: 32px 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text3);
+      display: none
+    }
+
+    .preset-empty.show {
+      display: block
+    }
+
+    .preset-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s
+    }
+
+    .preset-item:hover {
+      background: var(--bg3);
+      border-color: var(--border2)
+    }
+
+    .preset-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(79, 110, 247, .12);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .preset-icon svg {
+      width: 15px;
+      height: 15px;
+      color: var(--accent)
+    }
+
+    .preset-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .preset-pname {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .preset-meta {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .preset-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0
+    }
+
+    .pact-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .12s, color .12s
+    }
+
+    .pact-btn:hover {
+      background: var(--bg4);
+      color: var(--text)
+    }
+
+    .pact-btn.del:hover {
+      background: rgba(239, 68, 68, .15);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, .3)
+    }
+
+    .pact-btn svg {
+      width: 13px;
+      height: 13px
+    }
+
+    /* Media queries for Mobile & Tablet */
+    @media (max-width: 768px) {
+      .nav {
+        padding: 10px 12px;
+      }
+
+      .nav-sub {
+        display: none;
+      }
+
+      .main {
+        padding: 12px;
+      }
+
+      .sr {
+        padding: 10px 12px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .ctrl {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .cg:nth-child(5) {
+        margin-left: 0;
+      }
+
+      .sr {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .sr-sp {
+        display: none;
+      }
+
+      .exp-wrap {
+        flex: 1;
+        min-width: 140px;
+      }
+
+      .btn-exp {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .btn-dup {
+        flex: 1;
+        min-width: 130px;
+        justify-content: center;
+      }
+
+      .exp-drop {
+        left: 0;
+        right: 0;
+        width: 100%;
+      }
+
+      .pop {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: calc(100vw - 24px);
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .modal {
+        max-height: 90vh;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      .modal-overlay {
+        padding: 0;
+        align-items: flex-end;
+      }
+
+      .sbar {
+        justify-content: center;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<nav class="nav">
-  <div class="nav-logo">
-    <div class="nav-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="4" width="2" height="16"/><rect x="6" y="4" width="1.2" height="16"/>
-        <rect x="9.5" y="4" width="2" height="16"/><rect x="13.5" y="4" width="1.2" height="16"/>
-        <rect x="16.5" y="4" width="2" height="16"/><rect x="20.5" y="4" width="1.5" height="16"/>
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <rect x="2" y="4" width="2" height="16" />
+          <rect x="6" y="4" width="1.2" height="16" />
+          <rect x="9.5" y="4" width="2" height="16" />
+          <rect x="13.5" y="4" width="1.2" height="16" />
+          <rect x="16.5" y="4" width="2" height="16" />
+          <rect x="20.5" y="4" width="1.5" height="16" />
+        </svg>
+      </div>
+      <div>
+        <div class="nav-title">Label Studio</div>
+        <div class="nav-sub">Generate barcodes &amp; GS1 Data Matrix codes with ease</div>
+      </div>
+    </div>
+    <div class="nav-sp"></div>
+    <div class="nav-actions">
+      <button class="nb nb-install" id="install-pwa-btn" style="display:none" title="Install App">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        <span>Install App</span>
+      </button>
+      <div style="position:relative">
+        <button class="nb" id="presets-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <span>Presets</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+      </div>
+      <button class="nb nb-ic" id="focus-btn" title="Focus Mode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <line x1="8" y1="21" x2="16" y2="21" />
+          <line x1="12" y1="17" x2="12" y2="21" />
+        </svg>
+      </button>
+      <button class="nb nb-acc" id="gen-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+        </svg>
+        <span>Generate Codes</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="ctrl">
+
+      <!-- Barcode Type -->
+      <div class="cg">
+        <div class="cl">Barcode Type</div>
+        <div class="type-wrap">
+          <div class="type-sel" id="type-sel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="2" y="4" width="2" height="16" />
+              <rect x="6" y="4" width="1.2" height="16" />
+              <rect x="9.5" y="4" width="2" height="16" />
+              <rect x="13.5" y="4" width="1.2" height="16" />
+              <rect x="16.5" y="4" width="2" height="16" />
+            </svg>
+            <span class="type-val" id="type-val">Code 128</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round" style="width:13px;height:13px;color:var(--text3)">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+          <div class="type-drop" id="type-drop">
+            <div class="type-opt active" data-type="Code 128">Code 128</div>
+            <div class="type-opt" data-type="Code 39">Code 39</div>
+            <div class="type-opt" data-type="EAN-13">EAN-13</div>
+            <div class="type-opt" data-type="QR Code">QR Code</div>
+            <div class="type-opt" data-type="Data Matrix">Data Matrix</div>
+          </div>
+        </div>
+        <div class="cn">Select the barcode symbology</div>
+      </div>
+
+      <!-- Template -->
+      <div class="cg tpl-wrap">
+        <div class="cl">
+          Template
+          <button class="ib" id="tpl-info-btn" title="Template Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </button>
+        </div>
+        <input class="tpl-input" id="tpl-input" value="BOX-{{ 4000:2:4010 }}" />
+        <div class="cn">Use {{ }} to define iterators &amp; variables</div>
+        <div class="pop" id="tpl-pop">
+          <div class="pop-title">Template Syntax</div>
+          <div class="pop-sub">Use {{ }} to define iterators &amp; variables.</div>
+          <div class="ps">
+            <div class="ps-title">Numeric Range</div>
+            <div class="pr"><span class="pt b">{{ start:step:end }}</span><span class="pe">Example: {{ 1:1:5 }} → 1, 2,
+                3, 4, 5</span></div>
+          </div>
+          <div class="ps">
+            <div class="ps-title">String List</div>
+            <div class="pr"><span class="pt g">{{ A;B;C }}</span><span class="pe">Example: {{ A;B }} → A, B</span></div>
+          </div>
+          <div class="ps">
+            <div class="ps-title">Date / Time</div>
+            <div class="pr"><span class="pt p">{{ today:format }}</span><span class="pe">Example: {{ today:%Y%m%d }} →
+                20250525</span></div>
+          </div>
+          <div class="ps">
+            <div class="ps-title">UUID</div>
+            <div class="pr"><span class="pt p">{{ uuid }}</span><span class="pe">→ f47ac10b-58cc-4372…</span></div>
+          </div>
+          <div class="ps">
+            <div class="ps-title">Random String</div>
+            <div class="pr"><span class="pt y">{{ random:8 }}</span><span class="pe">→ aB7k9mX2 (length 1–64)</span>
+            </div>
+          </div>
+          <div class="ps">
+            <div class="ps-title">Repeat</div>
+            <div class="pr"><span class="pt y">{{ repeat:A,B,C:N }}</span><span class="pe">{{ repeat:Aa,Ab,Ba,Bb:2 }} →
+                Aa,Ab,Ba,Bb,Aa,Ab,Ba,Bb (N full cycles)</span></div>
+          </div>
+          <div class="pfooter">You can mix multiple tokens in any order.</div>
+        </div>
+      </div>
+
+      <!-- Module Size -->
+      <div class="cg">
+        <div class="cl">Module Size
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <div class="stp">
+          <div class="stv" id="mod-val">3</div>
+          <button class="stb" id="mod-minus" title="Decrease module size"><svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg></button>
+          <button class="stb" id="mod-plus" title="Increase module size"><svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg></button>
+        </div>
+        <div class="cn">Thickness of bars (1–20)</div>
+      </div>
+
+      <!-- Barcode Height -->
+      <div class="cg">
+        <div class="cl">Barcode Height
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <div class="stp">
+          <div class="stv" id="h-val">80</div>
+          <span class="stu">px</span>
+          <button class="stb" id="h-minus" title="Decrease barcode height"><svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg></button>
+          <button class="stb" id="h-plus" title="Increase barcode height"><svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg></button>
+        </div>
+        <div class="cn">Height of the barcode</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="cg" style="align-items:stretch">
+        <button class="btn-gen" id="gen-btn2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+          Generate Codes
+        </button>
+        <button class="btn-clr" id="clr-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6M9 6V4h6v2" />
+          </svg>
+          Clear All
+        </button>
+        <label class="auto-row">
+          <span class="toggle">
+            <input type="checkbox" id="auto-chk" checked />
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </span>
+          Auto-update
+        </label>
+      </div>
+    </div>
+
+    <!-- Status row -->
+    <div class="sr">
+      <div class="sr-chk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </div>
+      <div>
+        <div class="sr-text" id="sr-text">6 codes generated</div>
+        <div class="sr-range" id="sr-range">Range: 4000 to 4010 (step 2)</div>
+      </div>
+      <div class="sr-sp"></div>
+      <div class="exp-wrap">
+        <button class="btn-exp" id="exp-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Export / Import
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round" style="width:12px;height:12px">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+        <div class="exp-drop" id="exp-drop">
+          <button class="di" id="exp-csv">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export CSV
+          </button>
+          <button class="di" id="exp-pdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
+            </svg>
+            Export PDF
+          </button>
+          <button class="di" id="imp-csv">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Import CSV
+          </button>
+        </div>
+      </div>
+      <button class="btn-dup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+        Duplicates <span class="dup-b" id="dup-b">0</span>
+      </button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="sbar">
+    <span id="sbar-n">6 codes generated</span>
+    <span class="sbar-ok">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+        stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12" />
       </svg>
-    </div>
-    <div>
-      <div class="nav-title">Label Studio Pro</div>
-      <div class="nav-sub">Generate barcodes &amp; GS1 Data Matrix codes with ease</div>
-    </div>
+      Auto-saved to this device
+    </span>
+    <span>v1.0.0</span>
   </div>
-  <div class="nav-sp"></div>
-  <div style="position:relative">
-    <button class="nb" id="presets-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      Presets
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
-  </div>
-  <button class="nb nb-ic" id="focus-btn" title="Focus Mode">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-  </button>
-  <button class="nb nb-acc" id="gen-btn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-    Generate Codes
-  </button>
-</nav>
 
-<div class="main">
-  <div class="ctrl">
+  <div class="toast" id="toast"></div>
 
-    <!-- Barcode Type -->
-    <div class="cg">
-      <div class="cl">Barcode Type</div>
-      <div class="type-wrap">
-        <div class="type-sel" id="type-sel">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="2" height="16"/><rect x="6" y="4" width="1.2" height="16"/><rect x="9.5" y="4" width="2" height="16"/><rect x="13.5" y="4" width="1.2" height="16"/><rect x="16.5" y="4" width="2" height="16"/></svg>
-          <span class="type-val" id="type-val">Code 128</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;color:var(--text3)"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-        <div class="type-drop" id="type-drop">
-          <div class="type-opt active" data-type="Code 128">Code 128</div>
-          <div class="type-opt" data-type="Code 39">Code 39</div>
-          <div class="type-opt" data-type="EAN-13">EAN-13</div>
-          <div class="type-opt" data-type="QR Code">QR Code</div>
-          <div class="type-opt" data-type="Data Matrix">Data Matrix</div>
-        </div>
-      </div>
-      <div class="cn">Select the barcode symbology</div>
-    </div>
-
-    <!-- Template -->
-    <div class="cg tpl-wrap">
-      <div class="cl">
-        Template
-        <button class="ib" id="tpl-info-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </button>
-      </div>
-      <input class="tpl-input" id="tpl-input" value="BOX-{{ 4000:2:4010 }}"/>
-      <div class="cn">Use {{ }} to define iterators &amp; variables</div>
-      <div class="pop" id="tpl-pop">
-        <div class="pop-title">Template Syntax</div>
-        <div class="pop-sub">Use {{ }} to define iterators &amp; variables.</div>
-        <div class="ps"><div class="ps-title">Numeric Range</div>
-          <div class="pr"><span class="pt b">{{ start:step:end }}</span><span class="pe">Example: {{ 1:1:5 }} → 1, 2, 3, 4, 5</span></div></div>
-        <div class="ps"><div class="ps-title">String List</div>
-          <div class="pr"><span class="pt g">{{ A;B;C }}</span><span class="pe">Example: {{ A;B }} → A, B</span></div></div>
-        <div class="ps"><div class="ps-title">Date / Time</div>
-          <div class="pr"><span class="pt p">{{ today:format }}</span><span class="pe">Example: {{ today:%Y%m%d }} → 20250525</span></div></div>
-        <div class="ps"><div class="ps-title">UUID</div>
-          <div class="pr"><span class="pt p">{{ uuid }}</span><span class="pe">→ f47ac10b-58cc-4372…</span></div></div>
-        <div class="ps"><div class="ps-title">Random String</div>
-          <div class="pr"><span class="pt y">{{ random:8 }}</span><span class="pe">→ aB7k9mX2 (length 1–64)</span></div></div>
-        <div class="ps"><div class="ps-title">Repeat</div>
-          <div class="pr"><span class="pt y">{{ repeat:A,B,C:N }}</span><span class="pe">{{ repeat:Aa,Ab,Ba,Bb:2 }} → Aa,Ab,Ba,Bb,Aa,Ab,Ba,Bb (N full cycles)</span></div></div>
-        <div class="pfooter">You can mix multiple tokens in any order.</div>
-      </div>
-    </div>
-
-    <!-- Module Size -->
-    <div class="cg">
-      <div class="cl">Module Size
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      </div>
-      <div class="stp">
-        <div class="stv" id="mod-val">3</div>
-        <button class="stb" id="mod-minus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-        <button class="stb" id="mod-plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-      </div>
-      <div class="cn">Thickness of bars (1–20)</div>
-    </div>
-
-    <!-- Barcode Height -->
-    <div class="cg">
-      <div class="cl">Barcode Height
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      </div>
-      <div class="stp">
-        <div class="stv" id="h-val">80</div>
-        <span class="stu">px</span>
-        <button class="stb" id="h-minus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-        <button class="stb" id="h-plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-      </div>
-      <div class="cn">Height of the barcode</div>
-    </div>
-
-    <!-- Actions -->
-    <div class="cg" style="align-items:stretch">
-      <button class="btn-gen" id="gen-btn2">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Generate Codes
-      </button>
-      <button class="btn-clr" id="clr-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
-        Clear All
-      </button>
-      <label class="auto-row">
-        <span class="toggle">
-          <input type="checkbox" id="auto-chk" checked/>
-          <div class="toggle-track"></div>
-          <div class="toggle-thumb"></div>
+  <!-- Presets Modal -->
+  <div class="modal-overlay" id="presets-overlay">
+    <div class="modal" id="presets-modal">
+      <div class="modal-hdr">
+        <span class="modal-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" style="width:16px;height:16px">
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          Presets
         </span>
-        Auto-update
-      </label>
-    </div>
-  </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="mbtn" id="preset-import-btn" title="Import presets from JSON file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Import JSON
+          </button>
+          <button class="mbtn" id="preset-export-btn" title="Export all presets as JSON file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export JSON
+          </button>
+          <button class="modal-close" id="presets-close">&times;</button>
+        </div>
+      </div>
 
-  <!-- Status row -->
-  <div class="sr">
-    <div class="sr-chk">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
-    <div>
-      <div class="sr-text" id="sr-text">6 codes generated</div>
-      <div class="sr-range" id="sr-range">Range: 4000 to 4010 (step 2)</div>
-    </div>
-    <div class="sr-sp"></div>
-    <div class="exp-wrap">
-      <button class="btn-exp" id="exp-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Export / Import
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="exp-drop" id="exp-drop">
-        <button class="di" id="exp-csv">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export CSV
-        </button>
-        <button class="di" id="exp-pdf">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          Export PDF
-        </button>
-        <button class="di" id="imp-csv">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Import CSV
+      <!-- Save current as preset -->
+      <div class="preset-save-row">
+        <input class="preset-name-input" id="preset-name" placeholder="Preset name…" maxlength="60" />
+        <button class="mbtn mbtn-acc" id="preset-save-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
+          </svg>
+          Save current
         </button>
       </div>
+
+      <div class="preset-list" id="preset-list"></div>
+      <div class="preset-empty" id="preset-empty">No presets saved yet. Configure your settings and click "Save
+        current".</div>
     </div>
-    <button class="btn-dup">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Duplicates <span class="dup-b" id="dup-b">0</span>
-    </button>
   </div>
 
-  <div class="grid" id="grid"></div>
-</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bwip-js@3/dist/bwip-js-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // ── Barcode type ─────────────────────────────────────────────────────────────
+    var barcodeType = 'Code 128';
 
-<div class="sbar">
-  <span id="sbar-n">6 codes generated</span>
-  <span class="sbar-ok">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    Auto-saved to this device
-  </span>
-  <span>v1.0.0</span>
-</div>
+    // ── Scannable barcode rendering ──────────────────────────────────────────────
+    function renderBarcode(container, text, mod, h) {
+      container.innerHTML = '';
 
-<div class="toast" id="toast"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bwip-js@3/dist/bwip-js-min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-// ── Barcode type ─────────────────────────────────────────────────────────────
-var barcodeType='Code 128';
-
-// ── Scannable barcode rendering ──────────────────────────────────────────────
-function renderBarcode(container, text, mod, h) {
-  container.innerHTML='';
-
-  if(barcodeType==='QR Code') {
-    var cell=Math.max(2,mod);
-    var size=cell*33; // ~version 2 QR
-    var wrap=document.createElement('div');
-    wrap.style.cssText='display:inline-block;background:#fff;padding:'+cell+'px';
-    container.appendChild(wrap);
-    try {
-      new QRCode(wrap,{text:text,width:size,height:size,correctLevel:QRCode.CorrectLevel.M});
-    } catch(e){ wrap.textContent='Invalid for QR'; }
-    return;
-  }
-
-  if(barcodeType==='Data Matrix') {
-    // Use canvas + bwip-js bundled via a tiny Data Matrix encoder
-    // We use a canvas and bwipjs loaded from cdn
-    var canvas=document.createElement('canvas');
-    container.appendChild(canvas);
-    try {
-      bwipjs.toCanvas(canvas,{
-        bcid:'datamatrix',
-        text:text,
-        scale:mod,
-        padding:2
-      });
-    } catch(e){
-      container.innerHTML='<span style="font-size:11px;color:#ef4444">'+e.message+'</span>';
-    }
-    return;
-  }
-
-  // 1D codes via JsBarcode
-  var formatMap={
-    'Code 128':'CODE128',
-    'Code 39':'CODE39',
-    'EAN-13':'EAN13'
-  };
-  var fmt=formatMap[barcodeType]||'CODE128';
-  var encodeText=text;
-
-  // EAN-13 requires exactly 12 digits (JsBarcode computes the 13th check digit)
-  if(barcodeType==='EAN-13'){
-    var digits=text.replace(/\D/g,'');
-    if(digits.length===13) digits=digits.slice(0,12); // strip check digit, JsBarcode adds it
-    digits=(digits+'000000000000').slice(0,12);        // pad/truncate to 12
-    encodeText=digits;
-  }
-
-  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  container.appendChild(svg);
-  try {
-    JsBarcode(svg, encodeText, {
-      format: fmt,
-      width: mod,
-      height: h,
-      displayValue: false,
-      margin: 6,
-      background: '#ffffff',
-      lineColor: '#111111'
-    });
-  } catch(e) {
-    container.innerHTML='<span style="font-size:11px;color:#ef4444">'+e.message+'</span>';
-  }
-}
-
-// ── Template parser ──────────────────────────────────────────────────────────
-function parseTpl(tpl) {
-  var tokens=[],re=/\{\{([^}]+)\}\}/g,last=0,m;
-  while((m=re.exec(tpl))!==null){
-    if(m.index>last) tokens.push({t:'l',v:tpl.slice(last,m.index)});
-    var inn=m[1].trim();
-
-    // Numeric range: {{ start:step:end }}
-    if(/^\d+:\d+:\d+$/.test(inn)){
-      var p=inn.split(':').map(Number);
-      tokens.push({t:'r',s:p[0],st:p[1],e:p[2]});
-
-    // Repeat: {{ repeat:A,B,C:N }} — cycle A,B,C a total of N full rounds
-    } else if(/^repeat:/i.test(inn)){
-      var parts=inn.split(':');            // ['repeat','A,B,C','6']
-      var vals=parts[1].split(',').map(function(s){return s.trim();});
-      var n=parseInt(parts[2],10)||1;
-      var expanded=[];
-      for(var k=0;k<n;k++) for(var v=0;v<vals.length;v++) expanded.push(vals[v]);
-      tokens.push({t:'ls',items:expanded});
-
-    // String list: {{ A;B;C }}
-    } else if(/;/.test(inn)){
-      tokens.push({t:'ls',items:inn.split(';').map(function(s){return s.trim();})});
-
-    } else {
-      tokens.push({t:'l',v:'{{'+inn+'}}'}); // unknown — keep as literal
-    }
-    last=m.index+m[0].length;
-  }
-  if(last<tpl.length) tokens.push({t:'l',v:tpl.slice(last)});
-  return tokens;
-}
-
-// Returns array of values for an iterator token
-function iterValues(tok) {
-  if(tok.t==='r'){
-    var vals=[];
-    for(var v=tok.s;v<=tok.e;v+=tok.st) vals.push(String(v));
-    return vals;
-  }
-  return tok.items.slice();
-}
-
-// Cartesian product of arrays
-function cartesian(arrays) {
-  return arrays.reduce(function(acc,arr){
-    var res=[];
-    acc.forEach(function(a){ arr.forEach(function(b){ res.push(a.concat([b])); }); });
-    return res;
-  }, [[]]);
-}
-
-function expand(tokens) {
-  var iters=tokens.filter(function(t){return t.t!=='l';});
-  if(!iters.length) return [tokens.map(function(t){return t.v||'';}).join('')];
-
-  // Build cartesian product of all iterators
-  var product=cartesian(iters.map(iterValues));
-
-  return product.map(function(combo){
-    var str='',ii=0;
-    for(var j=0;j<tokens.length;j++){
-      var tok=tokens[j];
-      if(tok.t==='l'){str+=tok.v;continue;}
-      str+=combo[ii++];
-    }
-    return str;
-  });
-}
-
-// ── State ────────────────────────────────────────────────────────────────────
-var codes=[];
-
-function getI(id){return parseInt(document.getElementById(id).textContent,10);}
-
-function generate() {
-  var tpl=document.getElementById('tpl-input').value;
-  var mod=getI('mod-val'), h=getI('h-val');
-  codes=expand(parseTpl(tpl));
-
-  // Card min-width scales with module size so large barcodes don't get clipped
-  var cardMin=Math.max(170, mod*30);
-  document.getElementById('grid').style.setProperty('--card-min', cardMin+'px');
-
-  var grid=document.getElementById('grid');
-  grid.innerHTML='';
-  codes.forEach(function(code,i){
-    var card=document.createElement('div');
-    card.className='card';
-    card.innerHTML=
-      '<div class="card-hdr"><span class="card-num">#'+(i+1)+'</span>'+
-      '<button class="card-copy" data-code="'+code.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" title="Copy">'+
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'+
-      '</button></div>'+
-      '<div class="card-bc"></div>'+
-      '<div class="card-lbl">'+code+'</div>';
-    grid.appendChild(card);
-    renderBarcode(card.querySelector('.card-bc'), code, mod, h);
-  });
-  var n=codes.length+' codes generated';
-  document.getElementById('sr-text').textContent=n;
-  document.getElementById('sbar-n').textContent=n;
-  var rm=tpl.match(/\{\{\s*(\d+):(\d+):(\d+)\s*\}\}/);
-  document.getElementById('sr-range').textContent=rm?'Range: '+rm[1]+' to '+rm[3]+' (step '+rm[2]+')':'';
-  var seen={},dups=0;codes.forEach(function(c){seen[c]?dups++:seen[c]=1;});
-  document.getElementById('dup-b').textContent=dups;
-}
-
-function toast(msg){
-  var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
-  setTimeout(function(){el.classList.remove('show');},1800);
-}
-
-function closeAll(){
-  document.getElementById('tpl-pop').classList.remove('open');
-  document.getElementById('exp-drop').classList.remove('open');
-  document.getElementById('type-drop').classList.remove('open');
-}
-
-function stepVal(id,d,min,max){
-  var el=document.getElementById(id),v=parseInt(el.textContent,10)+d;
-  el.textContent=Math.min(max,Math.max(min,v));
-  autoRun();
-}
-
-function autoRun(){if(document.getElementById('auto-chk').checked) generate();}
-
-// ── Events ───────────────────────────────────────────────────────────────────
-document.getElementById('gen-btn').addEventListener('click',generate);
-document.getElementById('gen-btn2').addEventListener('click',generate);
-
-document.getElementById('clr-btn').addEventListener('click',function(){
-  codes=[];document.getElementById('grid').innerHTML='';
-  document.getElementById('sr-text').textContent='0 codes generated';
-  document.getElementById('sbar-n').textContent='0 codes generated';
-  document.getElementById('sr-range').textContent='';
-  document.getElementById('dup-b').textContent='0';
-});
-
-// Module size — only affects bar width, NOT height
-document.getElementById('mod-minus').addEventListener('click',function(){stepVal('mod-val',-1,1,20);});
-document.getElementById('mod-plus').addEventListener('click', function(){stepVal('mod-val', 1,1,20);});
-// Height — separate control
-document.getElementById('h-minus').addEventListener('click',function(){stepVal('h-val',-5,10,400);});
-document.getElementById('h-plus').addEventListener('click', function(){stepVal('h-val', 5,10,400);});
-
-// Template input auto-update
-var tplTimer=null;
-document.getElementById('tpl-input').addEventListener('input',function(){
-  clearTimeout(tplTimer);tplTimer=setTimeout(autoRun,400);
-});
-
-// Barcode type dropdown
-document.getElementById('type-sel').addEventListener('click',function(e){
-  e.stopPropagation();
-  document.getElementById('tpl-pop').classList.remove('open');
-  document.getElementById('exp-drop').classList.remove('open');
-  document.getElementById('type-drop').classList.toggle('open');
-});
-document.getElementById('type-drop').addEventListener('click',function(e){
-  var opt=e.target.closest('.type-opt');if(!opt)return;
-  barcodeType=opt.dataset.type;
-  document.getElementById('type-val').textContent=barcodeType;
-  document.querySelectorAll('.type-opt').forEach(function(o){o.classList.remove('active');});
-  opt.classList.add('active');
-  document.getElementById('type-drop').classList.remove('open');
-  autoRun();
-});
-
-// Template popover
-document.getElementById('tpl-info-btn').addEventListener('click',function(e){
-  e.stopPropagation();
-  document.getElementById('exp-drop').classList.remove('open');
-  document.getElementById('type-drop').classList.remove('open');
-  document.getElementById('tpl-pop').classList.toggle('open');
-});
-document.getElementById('tpl-pop').addEventListener('click',function(e){e.stopPropagation();});
-
-// Export dropdown
-document.getElementById('exp-btn').addEventListener('click',function(e){
-  e.stopPropagation();
-  document.getElementById('tpl-pop').classList.remove('open');
-  document.getElementById('type-drop').classList.remove('open');
-  document.getElementById('exp-drop').classList.toggle('open');
-});
-document.getElementById('exp-drop').addEventListener('click',function(e){e.stopPropagation();});
-
-document.getElementById('exp-csv').addEventListener('click',function(){
-  if(!codes.length){toast('No codes to export');return;}
-  var blob=new Blob(['Barcode\n'+codes.join('\n')],{type:'text/csv'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='barcodes.csv';a.click();
-  closeAll();
-});
-
-document.getElementById('exp-pdf').addEventListener('click',function(){
-  if(!codes.length){toast('No codes to export');return;}
-  closeAll();
-  toast('Generating PDF…');
-
-  var mod=getI('mod-val'), h=getI('h-val');
-  // Page: A4, landscape for wide barcodes
-  var doc=new jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  var pageW=210, pageH=297;
-  var margin=10, gap=6, labelH=5;
-  // Fit columns: estimate barcode width in mm (1px ≈ 0.264mm)
-  var bcWpx=mod*80; // rough estimate; we'll measure from canvas
-  var bcHpx=barcodeType==='QR Code'||barcodeType==='Data Matrix'?mod*33:h;
-  var bcWmm=Math.max(30, bcWpx*0.264);
-  var bcHmm=bcHpx*0.264;
-  var cellW=bcWmm+gap;
-  var cellH=bcHmm+labelH+gap+4;
-  var cols=Math.max(1,Math.floor((pageW-2*margin+gap)/cellW));
-  var rows=Math.max(1,Math.floor((pageH-2*margin+gap)/cellH));
-  var perPage=cols*rows;
-
-  // Render each code to a canvas, then embed as image
-  var pending=codes.length;
-  var images=new Array(codes.length);
-
-  function finish(){
-    var page=0;
-    images.forEach(function(img,idx){
-      var col=idx%cols, row=Math.floor(idx/cols)%rows;
-      if(idx>0&&idx%perPage===0){doc.addPage();page++;}
-      var x=margin+col*cellW;
-      var y=margin+row*cellH;
-      if(img){
-        doc.addImage(img,'PNG',x,y,bcWmm,bcHmm);
+      if (barcodeType === 'QR Code') {
+        var cell = Math.max(2, mod);
+        var size = cell * 33;
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'display:inline-block;background:#fff;padding:' + cell + 'px';
+        container.appendChild(wrap);
+        try {
+          new QRCode(wrap, { text: text, width: size, height: size, correctLevel: QRCode.CorrectLevel.M });
+        } catch (e) { wrap.textContent = 'Invalid for QR'; }
+        return;
       }
-      // Label
-      doc.setFontSize(7);
-      doc.setTextColor(60,60,60);
-      doc.text(codes[idx],x+bcWmm/2,y+bcHmm+labelH,{align:'center'});
-    });
-    doc.save('barcodes.pdf');
-    toast('PDF downloaded!');
-  }
 
-  codes.forEach(function(code,idx){
-    var canvas=document.createElement('canvas');
-    var done=function(){
-      images[idx]=canvas.toDataURL('image/png');
-      pending--;
-      if(pending===0) finish();
-    };
-
-    if(barcodeType==='Data Matrix'){
-      try{
-        bwipjs.toCanvas(canvas,{bcid:'datamatrix',text:code,scale:mod,padding:2});
-        done();
-      }catch(e){pending--;if(pending===0)finish();}
-    } else if(barcodeType==='QR Code'){
-      // QRCode renders into a div; grab the canvas/img it creates
-      var tmp=document.createElement('div');
-      document.body.appendChild(tmp);
-      tmp.style.cssText='position:absolute;left:-9999px';
-      var cell=Math.max(2,mod), size=cell*33;
-      try{
-        var qr=new QRCode(tmp,{text:code,width:size,height:size,correctLevel:QRCode.CorrectLevel.M});
-        setTimeout(function(){
-          var img=tmp.querySelector('img')||tmp.querySelector('canvas');
-          if(img){
-            if(img.tagName==='CANVAS'){
-              images[idx]=img.toDataURL('image/png');
-            } else {
-              var c2=document.createElement('canvas');
-              c2.width=img.naturalWidth||size;c2.height=img.naturalHeight||size;
-              c2.getContext('2d').drawImage(img,0,0);
-              images[idx]=c2.toDataURL('image/png');
-            }
-          }
-          document.body.removeChild(tmp);
-          pending--;if(pending===0)finish();
-        },200);
-      }catch(e){document.body.removeChild(tmp);pending--;if(pending===0)finish();}
-    } else {
-      // 1D via JsBarcode on canvas
-      var formatMap={'Code 128':'CODE128','Code 39':'CODE39','EAN-13':'EAN13'};
-      var fmt=formatMap[barcodeType]||'CODE128';
-      var encodeText=code;
-      if(barcodeType==='EAN-13'){
-        var digs=code.replace(/\D/g,'');
-        if(digs.length===13) digs=digs.slice(0,12);
-        encodeText=(digs+'000000000000').slice(0,12);
+      if (barcodeType === 'Data Matrix') {
+        var canvas = document.createElement('canvas');
+        container.appendChild(canvas);
+        try {
+          bwipjs.toCanvas(canvas, {
+            bcid: 'datamatrix',
+            text: text,
+            scale: mod,
+            padding: 2
+          });
+        } catch (e) {
+          container.innerHTML = '<span style="font-size:11px;color:#ef4444">' + e.message + '</span>';
+        }
+        return;
       }
-      try{
-        JsBarcode(canvas,encodeText,{format:fmt,width:mod,height:h,displayValue:false,margin:6,background:'#ffffff',lineColor:'#111111'});
-        done();
-      }catch(e){pending--;if(pending===0)finish();}
-    }
-  });
-});
-document.getElementById('imp-csv').addEventListener('click',function(){
-  var inp=document.createElement('input');inp.type='file';inp.accept='.csv';
-  inp.addEventListener('change',function(){
-    var f=inp.files[0];if(!f)return;
-    var r=new FileReader();
-    r.onload=function(ev){
-      var lines=ev.target.result.split('\n').map(function(l){return l.trim();}).filter(Boolean);
-      if(lines[0]&&lines[0].toLowerCase()==='barcode')lines.shift();
-      if(!lines.length){toast('No codes found');return;}
-      document.getElementById('tpl-input').value=lines.join(';');
-      toast('Imported '+lines.length+' codes');closeAll();generate();
-    };r.readAsText(f);
-  });inp.click();
-});
 
-// Copy delegation
-document.getElementById('grid').addEventListener('click',function(e){
-  var btn=e.target.closest('.card-copy');if(!btn)return;
-  var code=btn.getAttribute('data-code');
-  if(navigator.clipboard){navigator.clipboard.writeText(code).then(function(){toast('Copied: '+code);});}
-  else{toast('Clipboard unavailable');}
-});
+      var formatMap = {
+        'Code 128': 'CODE128',
+        'Code 39': 'CODE39',
+        'EAN-13': 'EAN13'
+      };
+      var fmt = formatMap[barcodeType] || 'CODE128';
+      var encodeText = text;
 
-// Focus mode toggle + ESC to exit
-var focusActive=false;
-function setFocus(on){
-  focusActive=on;
-  var n=document.querySelector('.nav'),s=document.querySelector('.sbar');
-  n.style.display=on?'none':'';
-  s.style.display=on?'none':'';
-}
-document.getElementById('focus-btn').addEventListener('click',function(){setFocus(!focusActive);});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&focusActive)setFocus(false);});
+      if (barcodeType === 'EAN-13') {
+        var digits = text.replace(/\D/g, '');
+        if (digits.length === 13) digits = digits.slice(0, 12);
+        digits = (digits + '000000000000').slice(0, 12);
+        encodeText = digits;
+      }
 
-// Auto-update checkbox
-document.getElementById('auto-chk').addEventListener('change',autoRun);
-
-// Close all dropdowns on outside click
-document.addEventListener('click',closeAll);
-
-// ── Init ─────────────────────────────────────────────────────────────────────
-generate();
-</script>
-
-<!-- Presets Modal -->
-<div class="modal-overlay" id="presets-overlay">
-  <div class="modal" id="presets-modal">
-    <div class="modal-hdr">
-      <span class="modal-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        Presets
-      </span>
-      <div style="display:flex;gap:6px;align-items:center">
-        <button class="mbtn" id="preset-import-btn" title="Import presets from JSON file">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Import JSON
-        </button>
-        <button class="mbtn" id="preset-export-btn" title="Export all presets as JSON file">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export JSON
-        </button>
-        <button class="modal-close" id="presets-close">&times;</button>
-      </div>
-    </div>
-
-    <!-- Save current as preset -->
-    <div class="preset-save-row">
-      <input class="preset-name-input" id="preset-name" placeholder="Preset name…" maxlength="60"/>
-      <button class="mbtn mbtn-acc" id="preset-save-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Save current
-      </button>
-    </div>
-
-    <div class="preset-list" id="preset-list"></div>
-    <div class="preset-empty" id="preset-empty">No presets saved yet. Configure your settings and click "Save current".</div>
-  </div>
-</div>
-
-<style>
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:16px}
-.modal-overlay.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.6)}
-.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
-.modal-title{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:0 4px;line-height:1}
-.modal-close:hover{color:var(--text)}
-.mbtn{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap}
-.mbtn:hover{background:var(--bg4)}
-.mbtn svg{width:12px;height:12px;flex-shrink:0}
-.mbtn-acc{background:var(--accent);border-color:var(--accent);color:#fff}
-.mbtn-acc:hover{background:var(--accent-h)}
-.preset-save-row{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
-.preset-name-input{flex:1;padding:7px 10px;border-radius:7px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:inherit;outline:none}
-.preset-name-input:focus{border-color:var(--accent)}
-.preset-list{overflow-y:auto;flex:1;padding:8px}
-.preset-empty{padding:32px 16px;text-align:center;font-size:12px;color:var(--text3);display:none}
-.preset-empty.show{display:block}
-.preset-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px;cursor:pointer;transition:border-color .15s,background .15s}
-.preset-item:hover{background:var(--bg3);border-color:var(--border2)}
-.preset-icon{width:32px;height:32px;background:var(--accent-dim,rgba(79,110,247,.12));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.preset-icon svg{width:15px;height:15px;color:var(--accent)}
-.preset-info{flex:1;min-width:0}
-.preset-pname{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.preset-meta{font-size:11px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.preset-actions{display:flex;gap:4px;flex-shrink:0}
-.pact-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s}
-.pact-btn:hover{background:var(--bg4);color:var(--text)}
-.pact-btn.del:hover{background:rgba(239,68,68,.15);color:#ef4444;border-color:rgba(239,68,68,.3)}
-.pact-btn svg{width:13px;height:13px}
-</style>
-
-<script>
-// ── Presets (localStorage) ────────────────────────────────────────────────────
-var PRESETS_KEY='lsp_presets_v1';
-
-function loadPresets(){
-  try{return JSON.parse(localStorage.getItem(PRESETS_KEY)||'[]');}catch(e){return[];}
-}
-function savePresets(arr){
-  try{localStorage.setItem(PRESETS_KEY,JSON.stringify(arr));}catch(e){}
-}
-
-function currentSettings(){
-  return {
-    type: barcodeType,
-    template: document.getElementById('tpl-input').value,
-    modSize: getI('mod-val'),
-    height: getI('h-val')
-  };
-}
-
-function applyPreset(p){
-  // barcode type
-  barcodeType=p.type||'Code 128';
-  document.getElementById('type-val').textContent=barcodeType;
-  document.querySelectorAll('.type-opt').forEach(function(o){
-    o.classList.toggle('active', o.dataset.type===barcodeType);
-  });
-  // template
-  document.getElementById('tpl-input').value=p.template||'';
-  // mod size
-  document.getElementById('mod-val').textContent=Math.min(20,Math.max(1,p.modSize||3));
-  // height
-  document.getElementById('h-val').textContent=Math.min(400,Math.max(10,p.height||80));
-  closePresetsModal();
-  autoRun();
-}
-
-function renderPresetList(){
-  var arr=loadPresets();
-  var list=document.getElementById('preset-list');
-  var empty=document.getElementById('preset-empty');
-  list.innerHTML='';
-  if(!arr.length){empty.classList.add('show');return;}
-  empty.classList.remove('show');
-  arr.forEach(function(p,idx){
-    var item=document.createElement('div');
-    item.className='preset-item';
-    item.innerHTML=
-      '<div class="preset-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>'+
-      '<div class="preset-info">'+
-        '<div class="preset-pname">'+escHtml(p.name)+'</div>'+
-        '<div class="preset-meta">'+escHtml(p.type)+' · '+escHtml(p.template)+'</div>'+
-      '</div>'+
-      '<div class="preset-actions">'+
-        '<button class="pact-btn" data-idx="'+idx+'" data-action="load" title="Load preset">'+
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>'+
-        '</button>'+
-        '<button class="pact-btn del" data-idx="'+idx+'" data-action="delete" title="Delete preset">'+
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>'+
-        '</button>'+
-      '</div>';
-    // click on item body = load
-    item.querySelector('.preset-info').addEventListener('click',function(){applyPreset(p);});
-    item.querySelector('.preset-icon').addEventListener('click',function(){applyPreset(p);});
-    list.appendChild(item);
-  });
-
-  // action buttons
-  list.addEventListener('click',function(e){
-    var btn=e.target.closest('.pact-btn');if(!btn)return;
-    var idx=parseInt(btn.dataset.idx,10);
-    var action=btn.dataset.action;
-    var arr2=loadPresets();
-    if(action==='load'){applyPreset(arr2[idx]);}
-    else if(action==='delete'){arr2.splice(idx,1);savePresets(arr2);renderPresetList();toast('Preset deleted');}
-  });
-}
-
-function escHtml(s){
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function openPresetsModal(){
-  document.getElementById('preset-name').value='';
-  renderPresetList();
-  document.getElementById('presets-overlay').classList.add('open');
-}
-function closePresetsModal(){
-  document.getElementById('presets-overlay').classList.remove('open');
-}
-
-// Save current
-document.getElementById('preset-save-btn').addEventListener('click',function(){
-  var name=document.getElementById('preset-name').value.trim();
-  if(!name){document.getElementById('preset-name').focus();toast('Enter a preset name');return;}
-  var arr=loadPresets();
-  // overwrite if same name
-  var existing=arr.findIndex(function(p){return p.name===name;});
-  var preset=Object.assign({name:name,savedAt:Date.now()},currentSettings());
-  if(existing>=0)arr[existing]=preset; else arr.push(preset);
-  savePresets(arr);
-  renderPresetList();
-  document.getElementById('preset-name').value='';
-  toast('Preset "'+name+'" saved');
-});
-
-// Enter key in name input
-document.getElementById('preset-name').addEventListener('keydown',function(e){
-  if(e.key==='Enter') document.getElementById('preset-save-btn').click();
-});
-
-// Export all as JSON
-document.getElementById('preset-export-btn').addEventListener('click',function(){
-  var arr=loadPresets();
-  if(!arr.length){toast('No presets to export');return;}
-  var blob=new Blob([JSON.stringify(arr,null,2)],{type:'application/json'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lsp-presets.json';a.click();
-  toast('Exported '+arr.length+' preset(s)');
-});
-
-// Import from JSON file
-document.getElementById('preset-import-btn').addEventListener('click',function(){
-  var inp=document.createElement('input');inp.type='file';inp.accept='.json';
-  inp.addEventListener('change',function(){
-    var f=inp.files[0];if(!f)return;
-    var r=new FileReader();
-    r.onload=function(ev){
-      try{
-        var imported=JSON.parse(ev.target.result);
-        if(!Array.isArray(imported))throw new Error('Invalid format');
-        var arr=loadPresets();
-        var added=0;
-        imported.forEach(function(p){
-          if(!p.name||!p.template)return;
-          var ex=arr.findIndex(function(x){return x.name===p.name;});
-          if(ex>=0)arr[ex]=p; else{arr.push(p);added++;}
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      container.appendChild(svg);
+      try {
+        JsBarcode(svg, encodeText, {
+          format: fmt,
+          width: mod,
+          height: h,
+          displayValue: false,
+          margin: 6,
+          background: '#ffffff',
+          lineColor: '#111111'
         });
-        savePresets(arr);renderPresetList();
-        toast('Imported '+(imported.length)+' preset(s)');
-      }catch(e){toast('Invalid JSON file');}
-    };r.readAsText(f);
-  });inp.click();
-});
+      } catch (e) {
+        container.innerHTML = '<span style="font-size:11px;color:#ef4444">' + e.message + '</span>';
+      }
+    }
 
-// Open/close
-document.getElementById('presets-btn').addEventListener('click',function(e){
-  e.stopPropagation();openPresetsModal();
-});
-document.getElementById('presets-close').addEventListener('click',closePresetsModal);
-document.getElementById('presets-overlay').addEventListener('click',function(e){
-  if(e.target===this)closePresetsModal();
-});
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'&&document.getElementById('presets-overlay').classList.contains('open'))closePresetsModal();
-});
-</script>
+    // ── Template parser ──────────────────────────────────────────────────────────
+    function parseTpl(tpl) {
+      var tokens = [], re = /\{\{([^}]+)\}\}/g, last = 0, m;
+      while ((m = re.exec(tpl)) !== null) {
+        if (m.index > last) tokens.push({ t: 'l', v: tpl.slice(last, m.index) });
+        var inn = m[1].trim();
+
+        if (/^\d+:\d+:\d+$/.test(inn)) {
+          var p = inn.split(':').map(Number);
+          tokens.push({ t: 'r', s: p[0], st: p[1], e: p[2] });
+
+        } else if (/^repeat:/i.test(inn)) {
+          var parts = inn.split(':');
+          var vals = parts[1].split(',').map(function (s) { return s.trim(); });
+          var n = parseInt(parts[2], 10) || 1;
+          var expanded = [];
+          for (var k = 0; k < n; k++) for (var v = 0; v < vals.length; v++) expanded.push(vals[v]);
+          tokens.push({ t: 'ls', items: expanded });
+
+        } else if (/;/.test(inn)) {
+          tokens.push({ t: 'ls', items: inn.split(';').map(function (s) { return s.trim(); }) });
+
+        } else {
+          tokens.push({ t: 'l', v: '{{' + inn + '}}' });
+        }
+        last = m.index + m[0].length;
+      }
+      if (last < tpl.length) tokens.push({ t: 'l', v: tpl.slice(last) });
+      return tokens;
+    }
+
+    function iterValues(tok) {
+      if (tok.t === 'r') {
+        var vals = [];
+        for (var v = tok.s; v <= tok.e; v += tok.st) vals.push(String(v));
+        return vals;
+      }
+      return tok.items.slice();
+    }
+
+    function cartesian(arrays) {
+      return arrays.reduce(function (acc, arr) {
+        var res = [];
+        acc.forEach(function (a) { arr.forEach(function (b) { res.push(a.concat([b])); }); });
+        return res;
+      }, [[]]);
+    }
+
+    function expand(tokens) {
+      var iters = tokens.filter(function (t) { return t.t !== 'l'; });
+      if (!iters.length) return [tokens.map(function (t) { return t.v || ''; }).join('')];
+
+      var product = cartesian(iters.map(iterValues));
+
+      return product.map(function (combo) {
+        var str = '', ii = 0;
+        for (var j = 0; j < tokens.length; j++) {
+          var tok = tokens[j];
+          if (tok.t === 'l') { str += tok.v; continue; }
+          str += combo[ii++];
+        }
+        return str;
+      });
+    }
+
+    // ── State ────────────────────────────────────────────────────────────────────
+    var codes = [];
+
+    function getI(id) { return parseInt(document.getElementById(id).textContent, 10); }
+
+    function generate() {
+      var tpl = document.getElementById('tpl-input').value;
+      var mod = getI('mod-val'), h = getI('h-val');
+      codes = expand(parseTpl(tpl));
+
+      var cardMin = Math.max(170, mod * 30);
+      document.getElementById('grid').style.setProperty('--card-min', cardMin + 'px');
+
+      var grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      codes.forEach(function (code, i) {
+        var card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML =
+          '<div class="card-hdr"><span class="card-num">#' + (i + 1) + '</span>' +
+          '<button class="card-copy" data-code="' + code.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" title="Copy">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+          '</button></div>' +
+          '<div class="card-bc"></div>' +
+          '<div class="card-lbl">' + code + '</div>';
+        grid.appendChild(card);
+        renderBarcode(card.querySelector('.card-bc'), code, mod, h);
+      });
+      var n = codes.length + ' codes generated';
+      document.getElementById('sr-text').textContent = n;
+      document.getElementById('sbar-n').textContent = n;
+      var rm = tpl.match(/\{\{\s*(\d+):(\d+):(\d+)\s*\}\}/);
+      document.getElementById('sr-range').textContent = rm ? 'Range: ' + rm[1] + ' to ' + rm[3] + ' (step ' + rm[2] + ')' : '';
+      var seen = {}, dups = 0; codes.forEach(function (c) { seen[c] ? dups++ : seen[c] = 1; });
+      document.getElementById('dup-b').textContent = dups;
+    }
+
+    function toast(msg) {
+      var el = document.getElementById('toast'); el.textContent = msg; el.classList.add('show');
+      setTimeout(function () { el.classList.remove('show'); }, 1800);
+    }
+
+    function closeAll() {
+      document.getElementById('tpl-pop').classList.remove('open');
+      document.getElementById('exp-drop').classList.remove('open');
+      document.getElementById('type-drop').classList.remove('open');
+    }
+
+    function stepVal(id, d, min, max) {
+      var el = document.getElementById(id), v = parseInt(el.textContent, 10) + d;
+      el.textContent = Math.min(max, Math.max(min, v));
+      autoRun();
+    }
+
+    function autoRun() { if (document.getElementById('auto-chk').checked) generate(); }
+
+    // ── Events ───────────────────────────────────────────────────────────────────
+    document.getElementById('gen-btn').addEventListener('click', generate);
+    document.getElementById('gen-btn2').addEventListener('click', generate);
+
+    document.getElementById('clr-btn').addEventListener('click', function () {
+      codes = []; document.getElementById('grid').innerHTML = '';
+      document.getElementById('sr-text').textContent = '0 codes generated';
+      document.getElementById('sbar-n').textContent = '0 codes generated';
+      document.getElementById('sr-range').textContent = '';
+      document.getElementById('dup-b').textContent = '0';
+    });
+
+    document.getElementById('mod-minus').addEventListener('click', function () { stepVal('mod-val', -1, 1, 20); });
+    document.getElementById('mod-plus').addEventListener('click', function () { stepVal('mod-val', 1, 1, 20); });
+    document.getElementById('h-minus').addEventListener('click', function () { stepVal('h-val', -5, 10, 400); });
+    document.getElementById('h-plus').addEventListener('click', function () { stepVal('h-val', 5, 10, 400); });
+
+    var tplTimer = null;
+    document.getElementById('tpl-input').addEventListener('input', function () {
+      clearTimeout(tplTimer); tplTimer = setTimeout(autoRun, 400);
+    });
+
+    document.getElementById('type-sel').addEventListener('click', function (e) {
+      e.stopPropagation();
+      document.getElementById('tpl-pop').classList.remove('open');
+      document.getElementById('exp-drop').classList.remove('open');
+      document.getElementById('type-drop').classList.toggle('open');
+    });
+    document.getElementById('type-drop').addEventListener('click', function (e) {
+      var opt = e.target.closest('.type-opt'); if (!opt) return;
+      barcodeType = opt.dataset.type;
+      document.getElementById('type-val').textContent = barcodeType;
+      document.querySelectorAll('.type-opt').forEach(function (o) { o.classList.remove('active'); });
+      opt.classList.add('active');
+      document.getElementById('type-drop').classList.remove('open');
+      autoRun();
+    });
+
+    document.getElementById('tpl-info-btn').addEventListener('click', function (e) {
+      e.stopPropagation();
+      document.getElementById('exp-drop').classList.remove('open');
+      document.getElementById('type-drop').classList.remove('open');
+      document.getElementById('tpl-pop').classList.toggle('open');
+    });
+    document.getElementById('tpl-pop').addEventListener('click', function (e) { e.stopPropagation(); });
+
+    document.getElementById('exp-btn').addEventListener('click', function (e) {
+      e.stopPropagation();
+      document.getElementById('tpl-pop').classList.remove('open');
+      document.getElementById('type-drop').classList.remove('open');
+      document.getElementById('exp-drop').classList.toggle('open');
+    });
+    document.getElementById('exp-drop').addEventListener('click', function (e) { e.stopPropagation(); });
+
+    document.getElementById('exp-csv').addEventListener('click', function () {
+      if (!codes.length) { toast('No codes to export'); return; }
+      var blob = new Blob(['Barcode\n' + codes.join('\n')], { type: 'text/csv' });
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'barcodes.csv'; a.click();
+      closeAll();
+    });
+
+    document.getElementById('exp-pdf').addEventListener('click', function () {
+      if (!codes.length) { toast('No codes to export'); return; }
+      closeAll();
+      toast('Generating PDF…');
+
+      var mod = getI('mod-val'), h = getI('h-val');
+      var doc = new jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      var pageW = 210, pageH = 297;
+      var margin = 10, gap = 6, labelH = 5;
+      var bcWpx = mod * 80;
+      var bcHpx = barcodeType === 'QR Code' || barcodeType === 'Data Matrix' ? mod * 33 : h;
+      var bcWmm = Math.max(30, bcWpx * 0.264);
+      var bcHmm = bcHpx * 0.264;
+      var cellW = bcWmm + gap;
+      var cellH = bcHmm + labelH + gap + 4;
+      var cols = Math.max(1, Math.floor((pageW - 2 * margin + gap) / cellW));
+      var rows = Math.max(1, Math.floor((pageH - 2 * margin + gap) / cellH));
+      var perPage = cols * rows;
+
+      var pending = codes.length;
+      var images = new Array(codes.length);
+
+      function finish() {
+        var page = 0;
+        images.forEach(function (img, idx) {
+          var col = idx % cols, row = Math.floor(idx / cols) % rows;
+          if (idx > 0 && idx % perPage === 0) { doc.addPage(); page++; }
+          var x = margin + col * cellW;
+          var y = margin + row * cellH;
+          if (img) {
+            doc.addImage(img, 'PNG', x, y, bcWmm, bcHmm);
+          }
+          doc.setFontSize(7);
+          doc.setTextColor(60, 60, 60);
+          doc.text(codes[idx], x + bcWmm / 2, y + bcHmm + labelH, { align: 'center' });
+        });
+        doc.save('barcodes.pdf');
+        toast('PDF downloaded!');
+      }
+
+      codes.forEach(function (code, idx) {
+        var canvas = document.createElement('canvas');
+        var done = function () {
+          images[idx] = canvas.toDataURL('image/png');
+          pending--;
+          if (pending === 0) finish();
+        };
+
+        if (barcodeType === 'Data Matrix') {
+          try {
+            bwipjs.toCanvas(canvas, { bcid: 'datamatrix', text: code, scale: mod, padding: 2 });
+            done();
+          } catch (e) { pending--; if (pending === 0) finish(); }
+        } else if (barcodeType === 'QR Code') {
+          var tmp = document.createElement('div');
+          document.body.appendChild(tmp);
+          tmp.style.cssText = 'position:absolute;left:-9999px';
+          var cell = Math.max(2, mod), size = cell * 33;
+          try {
+            var qr = new QRCode(tmp, { text: code, width: size, height: size, correctLevel: QRCode.CorrectLevel.M });
+            setTimeout(function () {
+              var img = tmp.querySelector('img') || tmp.querySelector('canvas');
+              if (img) {
+                if (img.tagName === 'CANVAS') {
+                  images[idx] = img.toDataURL('image/png');
+                } else {
+                  var c2 = document.createElement('canvas');
+                  c2.width = img.naturalWidth || size; c2.height = img.naturalHeight || size;
+                  c2.getContext('2d').drawImage(img, 0, 0);
+                  images[idx] = c2.toDataURL('image/png');
+                }
+              }
+              document.body.removeChild(tmp);
+              pending--; if (pending === 0) finish();
+            }, 200);
+          } catch (e) { document.body.removeChild(tmp); pending--; if (pending === 0) finish(); }
+        } else {
+          var formatMap = { 'Code 128': 'CODE128', 'Code 39': 'CODE39', 'EAN-13': 'EAN13' };
+          var fmt = formatMap[barcodeType] || 'CODE128';
+          var encodeText = code;
+          if (barcodeType === 'EAN-13') {
+            var digs = code.replace(/\D/g, '');
+            if (digs.length === 13) digs = digs.slice(0, 12);
+            encodeText = (digs + '000000000000').slice(0, 12);
+          }
+          try {
+            JsBarcode(canvas, encodeText, { format: fmt, width: mod, height: h, displayValue: false, margin: 6, background: '#ffffff', lineColor: '#111111' });
+            done();
+          } catch (e) { pending--; if (pending === 0) finish(); }
+        }
+      });
+    });
+
+    document.getElementById('imp-csv').addEventListener('click', function () {
+      var inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.csv';
+      inp.addEventListener('change', function () {
+        var f = inp.files[0]; if (!f) return;
+        var r = new FileReader();
+        r.onload = function (ev) {
+          var lines = ev.target.result.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+          if (lines[0] && lines[0].toLowerCase() === 'barcode') lines.shift();
+          if (!lines.length) { toast('No codes found'); return; }
+          document.getElementById('tpl-input').value = lines.join(';');
+          toast('Imported ' + lines.length + ' codes'); closeAll(); generate();
+        }; r.readAsText(f);
+      }); inp.click();
+    });
+
+    document.getElementById('grid').addEventListener('click', function (e) {
+      var btn = e.target.closest('.card-copy'); if (!btn) return;
+      var code = btn.getAttribute('data-code');
+      if (navigator.clipboard) { navigator.clipboard.writeText(code).then(function () { toast('Copied: ' + code); }); }
+      else { toast('Clipboard unavailable'); }
+    });
+
+    var focusActive = false;
+    function setFocus(on) {
+      focusActive = on;
+      var n = document.querySelector('.nav'), s = document.querySelector('.sbar');
+      n.style.display = on ? 'none' : '';
+      s.style.display = on ? 'none' : '';
+    }
+    document.getElementById('focus-btn').addEventListener('click', function () { setFocus(!focusActive); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && focusActive) setFocus(false); });
+
+    document.getElementById('auto-chk').addEventListener('change', autoRun);
+    document.addEventListener('click', closeAll);
+
+    // ── Presets (localStorage) ────────────────────────────────────────────────────
+    var PRESETS_KEY = 'lsp_presets_v1';
+
+    function loadPresets() {
+      try { return JSON.parse(localStorage.getItem(PRESETS_KEY) || '[]'); } catch (e) { return []; }
+    }
+    function savePresets(arr) {
+      try { localStorage.setItem(PRESETS_KEY, JSON.stringify(arr)); } catch (e) { }
+    }
+
+    function currentSettings() {
+      return {
+        type: barcodeType,
+        template: document.getElementById('tpl-input').value,
+        modSize: getI('mod-val'),
+        height: getI('h-val')
+      };
+    }
+
+    function applyPreset(p) {
+      barcodeType = p.type || 'Code 128';
+      document.getElementById('type-val').textContent = barcodeType;
+      document.querySelectorAll('.type-opt').forEach(function (o) {
+        o.classList.toggle('active', o.dataset.type === barcodeType);
+      });
+      document.getElementById('tpl-input').value = p.template || '';
+      document.getElementById('mod-val').textContent = Math.min(20, Math.max(1, p.modSize || 3));
+      document.getElementById('h-val').textContent = Math.min(400, Math.max(10, p.height || 80));
+      closePresetsModal();
+      autoRun();
+    }
+
+    function renderPresetList() {
+      var arr = loadPresets();
+      var list = document.getElementById('preset-list');
+      var empty = document.getElementById('preset-empty');
+      list.innerHTML = '';
+      if (!arr.length) { empty.classList.add('show'); return; }
+      empty.classList.remove('show');
+      arr.forEach(function (p, idx) {
+        var item = document.createElement('div');
+        item.className = 'preset-item';
+        item.innerHTML =
+          '<div class="preset-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>' +
+          '<div class="preset-info">' +
+          '<div class="preset-pname">' + escHtml(p.name) + '</div>' +
+          '<div class="preset-meta">' + escHtml(p.type) + ' · ' + escHtml(p.template) + '</div>' +
+          '</div>' +
+          '<div class="preset-actions">' +
+          '<button class="pact-btn" data-idx="' + idx + '" data-action="load" title="Load preset">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>' +
+          '</button>' +
+          '<button class="pact-btn del" data-idx="' + idx + '" data-action="delete" title="Delete preset">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>' +
+          '</button>' +
+          '</div>';
+        item.querySelector('.preset-info').addEventListener('click', function () { applyPreset(p); });
+        item.querySelector('.preset-icon').addEventListener('click', function () { applyPreset(p); });
+        list.appendChild(item);
+      });
+
+      list.addEventListener('click', function (e) {
+        var btn = e.target.closest('.pact-btn'); if (!btn) return;
+        var idx = parseInt(btn.dataset.idx, 10);
+        var action = btn.dataset.action;
+        var arr2 = loadPresets();
+        if (action === 'load') { applyPreset(arr2[idx]); }
+        else if (action === 'delete') { arr2.splice(idx, 1); savePresets(arr2); renderPresetList(); toast('Preset deleted'); }
+      });
+    }
+
+    function escHtml(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function openPresetsModal() {
+      document.getElementById('preset-name').value = '';
+      renderPresetList();
+      document.getElementById('presets-overlay').classList.add('open');
+    }
+    function closePresetsModal() {
+      document.getElementById('presets-overlay').classList.remove('open');
+    }
+
+    document.getElementById('preset-save-btn').addEventListener('click', function () {
+      var name = document.getElementById('preset-name').value.trim();
+      if (!name) { document.getElementById('preset-name').focus(); toast('Enter a preset name'); return; }
+      var arr = loadPresets();
+      var existing = arr.findIndex(function (p) { return p.name === name; });
+      var preset = Object.assign({ name: name, savedAt: Date.now() }, currentSettings());
+      if (existing >= 0) arr[existing] = preset; else arr.push(preset);
+      savePresets(arr);
+      renderPresetList();
+      document.getElementById('preset-name').value = '';
+      toast('Preset "' + name + '" saved');
+    });
+
+    document.getElementById('preset-name').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') document.getElementById('preset-save-btn').click();
+    });
+
+    document.getElementById('preset-export-btn').addEventListener('click', function () {
+      var arr = loadPresets();
+      if (!arr.length) { toast('No presets to export'); return; }
+      var blob = new Blob([JSON.stringify(arr, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lsp-presets.json'; a.click();
+      toast('Exported ' + arr.length + ' preset(s)');
+    });
+
+    document.getElementById('preset-import-btn').addEventListener('click', function () {
+      var inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json';
+      inp.addEventListener('change', function () {
+        var f = inp.files[0]; if (!f) return;
+        var r = new FileReader();
+        r.onload = function (ev) {
+          try {
+            var imported = JSON.parse(ev.target.result);
+            if (!Array.isArray(imported)) throw new Error('Invalid format');
+            var arr = loadPresets();
+            var added = 0;
+            imported.forEach(function (p) {
+              if (!p.name || !p.template) return;
+              var ex = arr.findIndex(function (x) { return x.name === p.name; });
+              if (ex >= 0) arr[ex] = p; else { arr.push(p); added++; }
+            });
+            savePresets(arr); renderPresetList();
+            toast('Imported ' + (imported.length) + ' preset(s)');
+          } catch (e) { toast('Invalid JSON file'); }
+        }; r.readAsText(f);
+      }); inp.click();
+    });
+
+    document.getElementById('presets-btn').addEventListener('click', function (e) {
+      e.stopPropagation(); openPresetsModal();
+    });
+    document.getElementById('presets-close').addEventListener('click', closePresetsModal);
+    document.getElementById('presets-overlay').addEventListener('click', function (e) {
+      if (e.target === this) closePresetsModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && document.getElementById('presets-overlay').classList.contains('open')) closePresetsModal();
+    });
+
+    // ── PWA Service Worker & Installation Handler ───────────────────────────────
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./sw.js')
+          .then(function (reg) { console.log('SW registered successfully:', reg.scope); })
+          .catch(function (err) { console.warn('SW registration failed:', err); });
+      });
+    }
+
+    var deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      var installBtn = document.getElementById('install-pwa-btn');
+      if (installBtn) installBtn.style.display = 'inline-flex';
+    });
+
+    var installBtn = document.getElementById('install-pwa-btn');
+    if (installBtn) {
+      installBtn.addEventListener('click', function () {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function (choiceResult) {
+          if (choiceResult.outcome === 'accepted') {
+            toast('Label Studio installed!');
+          }
+          deferredPrompt = null;
+          installBtn.style.display = 'none';
+        });
+      });
+    }
+
+    window.addEventListener('appinstalled', function () {
+      toast('Label Studio installed successfully!');
+      if (installBtn) installBtn.style.display = 'none';
+    });
+
+    // ── Init ─────────────────────────────────────────────────────────────────────
+    generate();
+  </script>
 </body>
+
 </html>
