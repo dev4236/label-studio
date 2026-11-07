@@ -12,7 +12,7 @@ async function selectType(page, type) {
   await page.locator(`[data-type="${type}"]`).click();
 }
 
-async function dragFirstResizeHandle(page, deltaX) {
+async function dragFirstResizeHandle(page, deltaX, deltaY = 0) {
   const handle = page.locator('.card-resize').first();
   await handle.scrollIntoViewIfNeeded();
   const box = await handle.boundingBox();
@@ -22,12 +22,12 @@ async function dragFirstResizeHandle(page, deltaX) {
   if (coarsePointer) {
     const cdp = await page.context().newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: startX, y: startY }] });
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: startX + deltaX, y: startY }] });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: startX + deltaX, y: startY + deltaY }] });
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   } else {
     await page.mouse.move(startX, startY);
     await page.mouse.down();
-    await page.mouse.move(startX + deltaX, startY, { steps: 5 });
+    await page.mouse.move(startX + deltaX, startY + deltaY, { steps: 5 });
     await page.mouse.up();
   }
 }
@@ -159,6 +159,31 @@ test('dragging a card corner inward reduces every QR code', async ({ page }) => 
   const moduleSizes = await page.locator('.qr-shell').evaluateAll(nodes => nodes.map(node => Number(node.dataset.moduleSize)));
   expect(await page.locator('#mod-val').inputValue()).toBe('2');
   expect(moduleSizes).toEqual([2, 2, 2]);
+});
+
+test('dragging a QR corner vertically resizes every QR while keeping each symbol square', async ({ page }) => {
+  await selectQr(page);
+  await page.locator('#mod-val').fill('4');
+  await page.locator('#tpl-input').fill('VERTICAL-{{ 1:1:3 }}');
+  await page.locator('#gen-btn2').click();
+
+  const before = await page.locator('.qr-shell').evaluateAll(nodes => nodes.map(node => ({
+    width: node.getBoundingClientRect().width,
+    height: node.getBoundingClientRect().height,
+    moduleSize: Number(node.dataset.moduleSize),
+  })));
+
+  await dragFirstResizeHandle(page, 0, -144);
+
+  const after = await page.locator('.qr-shell').evaluateAll(nodes => nodes.map(node => ({
+    width: node.getBoundingClientRect().width,
+    height: node.getBoundingClientRect().height,
+    moduleSize: Number(node.dataset.moduleSize),
+  })));
+
+  expect(after.map(item => item.moduleSize)).toEqual([2, 2, 2]);
+  expect(after.every(item => item.width === item.height)).toBe(true);
+  expect(after.every(item => item.width < before[0].width)).toBe(true);
 });
 
 test('dragging inward resizes wide Code 128 cards without fractionally scaling bars', async ({ page }) => {

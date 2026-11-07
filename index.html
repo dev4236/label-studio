@@ -2190,8 +2190,10 @@
           handle: handle,
           pointerId: e.pointerId,
           startX: e.clientX,
+          startY: e.clientY,
           startWidth: handle.closest('.card').getBoundingClientRect().width,
-          startMod: getI('mod-val')
+          startMod: getI('mod-val'),
+          type: selectedBarcodeType()
         };
         handle.setPointerCapture(e.pointerId);
         document.body.classList.add('code-resizing');
@@ -2202,8 +2204,11 @@
         e.preventDefault();
         var maxWidth = grid.clientWidth;
         var deltaX = e.clientX - drag.startX;
-        var targetWidth = Math.min(maxWidth, Math.max(84, drag.startWidth + deltaX));
-        var nextMod = Math.min(20, Math.max(1, drag.startMod + Math.round(deltaX / 72)));
+        var deltaY = e.clientY - drag.startY;
+        var isSquareSymbol = drag.type === 'QR Code' || drag.type === 'Data Matrix';
+        var resizeDelta = isSquareSymbol && Math.abs(deltaY) > Math.abs(deltaX) ? deltaY : deltaX;
+        var targetWidth = Math.min(maxWidth, Math.max(84, drag.startWidth + resizeDelta));
+        var nextMod = Math.min(20, Math.max(1, drag.startMod + Math.round(resizeDelta / 72)));
         if (nextMod !== getI('mod-val')) resizeGeneratedCodes(nextMod, targetWidth);
         else updateGridCardWidth(targetWidth);
       });
