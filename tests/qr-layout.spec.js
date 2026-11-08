@@ -209,6 +209,32 @@ test('dragging inward resizes wide Code 128 cards without fractionally scaling b
   expect(after.symbol).toBe(after.intrinsic);
 });
 
+test('dragging a linear barcode corner vertically adjusts every barcode height', async ({ page }) => {
+  await selectType(page, 'Code 128');
+  await page.locator('#mod-val').fill('2');
+  await page.locator('#h-val').fill('80');
+  await page.locator('#tpl-input').fill('HEIGHT-{{ 1:1:3 }}');
+  await page.locator('#gen-btn2').click();
+
+  const before = await page.locator('.card-bc svg').evaluateAll(nodes => nodes.map(node => ({
+    width: parseFloat(node.getAttribute('width')),
+    height: parseFloat(node.getAttribute('height')),
+  })));
+
+  await dragFirstResizeHandle(page, 0, -40);
+
+  const after = await page.locator('.card-bc svg').evaluateAll(nodes => nodes.map(node => ({
+    width: parseFloat(node.getAttribute('width')),
+    height: parseFloat(node.getAttribute('height')),
+  })));
+
+  await expect(page.locator('#h-val')).toHaveValue('40');
+  await expect(page.locator('#mod-val')).toHaveValue('2');
+  expect(after).toHaveLength(3);
+  expect(after.every((item, index) => item.height === before[index].height - 40)).toBe(true);
+  expect(after.every((item, index) => item.width === before[index].width)).toBe(true);
+});
+
 test('oversized symbols can be scrolled from their left edge to their right edge', async ({ page }) => {
   await selectType(page, 'Code 128');
   await page.locator('#mod-val').fill('3');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'label-studio-pwa-v6';
+const CACHE_NAME = 'label-studio-pwa-v7';
 
 const ASSETS_TO_CACHE = [
   './',

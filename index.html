@@ -1908,9 +1908,10 @@
       return width;
     }
 
-    function resizeGeneratedCodes(mod, cardWidth) {
-      var h = getI('h-val');
+    function resizeGeneratedCodes(mod, cardWidth, requestedHeight) {
+      var h = Number.isFinite(requestedHeight) ? requestedHeight : getI('h-val');
       document.getElementById('mod-val').value = mod;
+      document.getElementById('h-val').value = h;
       Array.from(document.querySelectorAll('#grid .card')).forEach(function (card, index) {
         renderBarcode(card.querySelector('.card-bc'), codes[index], mod, h);
       });
@@ -2193,6 +2194,7 @@
           startY: e.clientY,
           startWidth: handle.closest('.card').getBoundingClientRect().width,
           startMod: getI('mod-val'),
+          startHeight: getI('h-val'),
           type: selectedBarcodeType()
         };
         handle.setPointerCapture(e.pointerId);
@@ -2209,7 +2211,12 @@
         var resizeDelta = isSquareSymbol && Math.abs(deltaY) > Math.abs(deltaX) ? deltaY : deltaX;
         var targetWidth = Math.min(maxWidth, Math.max(84, drag.startWidth + resizeDelta));
         var nextMod = Math.min(20, Math.max(1, drag.startMod + Math.round(resizeDelta / 72)));
-        if (nextMod !== getI('mod-val')) resizeGeneratedCodes(nextMod, targetWidth);
+        var nextHeight = isSquareSymbol
+          ? drag.startHeight
+          : Math.min(400, Math.max(10, drag.startHeight + Math.round(deltaY / 5) * 5));
+        if (nextMod !== getI('mod-val') || nextHeight !== getI('h-val')) {
+          resizeGeneratedCodes(nextMod, targetWidth, nextHeight);
+        }
         else updateGridCardWidth(targetWidth);
       });
 
